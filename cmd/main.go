@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -20,14 +22,18 @@ func main() {
 		Use:   "run",
 		Short: "Run a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Printf("run container\n")
+			runContainer(args)
 		},
 	}
 	stopCMD := &cobra.Command{
 		Use:   "stop",
 		Short: "Stop a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Printf("stop container\n")
+			if len(args) != 1 {
+				cmd.Printf("Usage: stop <container-id>")
+				return
+			}
+			fmt.Println("stop container")
 		},
 	}
 
@@ -39,4 +45,13 @@ func main() {
 		panic(err)
 	}
 
+}
+
+func runContainer(args []string) {
+	// TODO: run container
+	if len(args) != 1 {
+		fmt.Printf("Usage: start <container-id>")
+		return
+	}
+	fmt.Println("run container")
 }
