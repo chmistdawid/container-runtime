@@ -6,11 +6,71 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func main() {
+func NewRunCmd() *cobra.Command {
+	var cpu string
+	var ram string
+	var env string
+	var volume string
+	var network_bridge string
+	runCmd := &cobra.Command{
+		Args:  cobra.MinimumNArgs(1),
+		Use:   "run",
+		Short: "Run a container",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("run")
+			fmt.Println(cpu)
+			fmt.Println(ram)
+			fmt.Println(env)
+			fmt.Println(volume)
+			fmt.Println(network_bridge)
+		},
+	}
+	runCmd.PersistentFlags().StringVarP(&cpu, "cpu", "c", "1", "CPUs")
+	runCmd.PersistentFlags().StringVarP(&ram, "ram", "r", "1", "RAM")
+	runCmd.PersistentFlags().StringVarP(&env, "env", "e", "", "Environment variables")
+	runCmd.PersistentFlags().StringVarP(&volume, "volume", "v", "", "Volumes")
+	runCmd.PersistentFlags().StringVarP(&network_bridge, "network-bridge", "n", "", "Network bridge")
+	return runCmd
+}
+
+func NewStartCmd() *cobra.Command {
+	startCmd := &cobra.Command{
+		Args:  cobra.MinimumNArgs(1),
+		Use:   "start",
+		Short: "Start a container",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("start")
+		},
+	}
+	return startCmd
+}
+
+func NewStopCmd() *cobra.Command {
+	stopCmd := &cobra.Command{
+		Args:  cobra.MinimumNArgs(1),
+		Use:   "stop",
+		Short: "Stop a container",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("stop")
+		},
+	}
+	return stopCmd
+}
+
+func NewRestartCmd() *cobra.Command {
+	restartCmd := &cobra.Command{
+		Args:  cobra.MinimumNArgs(1),
+		Use:   "restart",
+		Short: "Restart a container",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("restart")
+		},
+	}
+	return restartCmd
+}
+
+func NewVersionCmd() *cobra.Command {
 	var version = "0.0.1"
-
-	var rootCmd = &cobra.Command{Use: "app"}
-
 	versionCmd := &cobra.Command{
 		Use:   "version",
 		Short: "Print the version number of container-runtime",
@@ -18,40 +78,26 @@ func main() {
 			cmd.Printf("container-runtime version %s\n", version)
 		},
 	}
-	runCmd := &cobra.Command{
-		Use:   "run",
-		Short: "Run a container",
-		Run: func(cmd *cobra.Command, args []string) {
-			runContainer(args)
-		},
-	}
-	stopCMD := &cobra.Command{
-		Use:   "stop",
-		Short: "Stop a container",
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) != 1 {
-				cmd.Printf("Usage: stop <container-id>")
-				return
-			}
-			fmt.Println("stop container")
-		},
-	}
+	return versionCmd
+}
+func main() {
 
+	var rootCmd = &cobra.Command{Use: "app"}
+
+	stopCMD := NewStopCmd()
+	runCmd := NewRunCmd()
+	startCmd := NewStartCmd()
+	restartCmd := NewRestartCmd()
+	versionCmd := NewVersionCmd()
+
+	rootCmd.AddCommand(startCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(stopCMD)
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(restartCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		panic(err)
 	}
 
-}
-
-func runContainer(args []string) {
-	// TODO: run container
-	if len(args) != 1 {
-		fmt.Printf("Usage: start <container-id>")
-		return
-	}
-	fmt.Println("run container")
 }
