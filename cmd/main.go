@@ -1,11 +1,25 @@
 package main
 
 import (
+	"database/sql"
+	"log"
+	"os"
+
 	"github.com/chmistdawid/container-runtime/cli"
 	"github.com/spf13/cobra"
 )
 
 func main() {
+
+	dbName := "file:./local.db"
+	//imagesDir := "./images"
+
+	db, err := sql.Open("libsql", dbName)
+	if err != nil {
+		log.Printf("failed to open db %s", err)
+		os.Exit(1)
+	}
+	defer db.Close()
 
 	var rootCmd = &cobra.Command{Use: "app"}
 
