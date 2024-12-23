@@ -30,7 +30,7 @@ func NewRunCmd() *cobra.Command {
 	runCmd.PersistentFlags().StringVarP(&volume, "volume", "v", "", "Volumes")
 	runCmd.PersistentFlags().StringVarP(&image, "image", "i", "", "Image")
 	runCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
-	runCmd.PersistentFlags().StringVarP(&network_bridge, "network-bridge", "n", "", "Network bridge")
+	runCmd.PersistentFlags().StringVarP(&network_bridge, "network-bridge", "b", "", "Network bridge")
 	return runCmd
 }
 
