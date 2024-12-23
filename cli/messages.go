@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func sendStartMessage(cpu string, ram string, env string, volume string, network_bridge string, image string, name string) {
+func sendRunMessage(cpu string, ram string, env string, volume string, network_bridge string, image string, name string) {
 	conn, err := net.Dial("unix", SOCK_PATH)
 	if err != nil {
 		fmt.Printf("Error connecting to socket: %v\n", err)
@@ -14,7 +14,7 @@ func sendStartMessage(cpu string, ram string, env string, volume string, network
 	}
 	defer conn.Close()
 
-	message := fmt.Sprintf("start %s %s %s %s %s %s %s", cpu, ram, env, volume, network_bridge, image, name)
+	message := fmt.Sprintf("run %s %s %s %s %s %s %s", cpu, ram, env, volume, network_bridge, image, name)
 
 	_, err = conn.Write([]byte(message))
 	if err != nil {
@@ -25,6 +25,24 @@ func sendStartMessage(cpu string, ram string, env string, volume string, network
 	fmt.Println("Message sent successfully")
 }
 
+func sendStartMessage(name string) {
+	conn, err := net.Dial("unix", SOCK_PATH)
+	if err != nil {
+		fmt.Printf("Error connecting to socket: %v\n", err)
+		os.Exit(1)
+	}
+	defer conn.Close()
+
+	message := fmt.Sprintf("start %s", name)
+
+	_, err = conn.Write([]byte(message))
+	if err != nil {
+		fmt.Printf("Error writing to socket: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Message sent successfully")
+}
 func sendStopMessage(name string) {
 	conn, err := net.Dial("unix", SOCK_PATH)
 	if err != nil {

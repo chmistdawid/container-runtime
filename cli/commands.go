@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
 )
 
@@ -17,11 +15,11 @@ func NewRunCmd() *cobra.Command {
 	var image string
 	var name string
 	runCmd := &cobra.Command{
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.MinimumNArgs(0),
 		Use:   "run",
 		Short: "Run a container",
 		Run: func(cmd *cobra.Command, args []string) {
-
+			sendRunMessage(cpu, ram, env, volume, network_bridge, image, name)
 		},
 	}
 	runCmd.PersistentFlags().StringVarP(&cpu, "cpu", "c", "1", "CPUs")
@@ -41,7 +39,7 @@ func NewStartCmd() *cobra.Command {
 		Use:   "start",
 		Short: "Start a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			log.Println("start")
+			sendStartMessage(name)
 		},
 	}
 	startCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
@@ -55,7 +53,7 @@ func NewStopCmd() *cobra.Command {
 		Use:   "stop",
 		Short: "Stop a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			log.Println("stop")
+			sendStopMessage(name)
 		},
 	}
 	stopCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
@@ -69,7 +67,7 @@ func NewRestartCmd() *cobra.Command {
 		Use:   "restart",
 		Short: "Restart a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			log.Println("restart")
+			sendRestartMessage(name)
 		},
 	}
 	restartCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
@@ -83,7 +81,7 @@ func NewStatusCmd() *cobra.Command {
 		Use:   "status",
 		Short: "Status a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			log.Println("status")
+			sendStatusMessage(name)
 		},
 	}
 	statusCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
@@ -97,7 +95,7 @@ func NewDeleteCmd() *cobra.Command {
 		Use:   "delete",
 		Short: "Delete a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			log.Println("delete")
+			sendDeleteMessage(name)
 		},
 	}
 	deleteCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")

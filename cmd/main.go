@@ -19,8 +19,9 @@ func main() {
 	statusCmd := cli.NewStatusCmd()
 	deleteCmd := cli.NewDeleteCmd()
 
-	rootCmd.AddCommand(startCmd)
 	rootCmd.AddCommand(versionCmd)
+
+	rootCmd.AddCommand(startCmd)
 	rootCmd.AddCommand(stopCMD)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(restartCmd)
