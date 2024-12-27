@@ -1,28 +1,16 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
+
+	"github.com/chmistdawid/container-runtime/proto"
 )
 
-func sendRunMessage(cpu string, ram string, env string, volume string, network_bridge string, image string, name string) {
-	conn, err := net.Dial("unix", SOCK_PATH)
-	if err != nil {
-		fmt.Printf("Error connecting to socket: %v\n", err)
-		os.Exit(1)
-	}
-	defer conn.Close()
+func sendRunMessage(in *proto.RunRequest, ctx context.Context) {
 
-	message := fmt.Sprintf("run %s %s %s %s %s %s %s", cpu, ram, env, volume, network_bridge, image, name)
-
-	_, err = conn.Write([]byte(message))
-	if err != nil {
-		fmt.Printf("Error writing to socket: %v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Println("Message sent successfully")
 }
 
 func sendStartMessage(name string) {
