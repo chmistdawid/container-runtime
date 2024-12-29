@@ -1,12 +1,17 @@
 package cli
 
 import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/chmistdawid/container-runtime/proto"
 	"github.com/spf13/cobra"
 )
 
 const SOCK_PATH = "/var/run/feather.sock"
 
-func NewRunCmd() *cobra.Command {
+func NewRunCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 	var cpu string
 	var ram string
 	var env string
@@ -14,16 +19,29 @@ func NewRunCmd() *cobra.Command {
 	var network_bridge string
 	var image string
 	var name string
+
 	runCmd := &cobra.Command{
 		Args:  cobra.MinimumNArgs(0),
 		Use:   "run",
 		Short: "Run a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendRunMessage(cpu, ram, env, volume, network_bridge, image, name)
+			resp, err := c.Run(ctx, &proto.RunRequest{
+				Cpu:           cpu,
+				Ram:           ram,
+				Env:           env,
+				Volume:        volume,
+				NetworkBridge: network_bridge,
+				Image:         image,
+				Name:          name,
+			})
+			if err != nil {
+				log.Fatalf("failed to run container: %v", err)
+			}
+			fmt.Println(resp.Message)
 		},
 	}
-	runCmd.PersistentFlags().StringVarP(&cpu, "cpu", "c", "1", "CPUs")
-	runCmd.PersistentFlags().StringVarP(&ram, "ram", "r", "1", "RAM")
+	runCmd.PersistentFlags().StringVarP(&cpu, "cpu", "c", "", "CPUs")
+	runCmd.PersistentFlags().StringVarP(&ram, "ram", "r", "", "RAM")
 	runCmd.PersistentFlags().StringVarP(&env, "env", "e", "", "Environment variables")
 	runCmd.PersistentFlags().StringVarP(&volume, "volume", "v", "", "Volumes")
 	runCmd.PersistentFlags().StringVarP(&image, "image", "i", "", "Image")
@@ -32,77 +50,108 @@ func NewRunCmd() *cobra.Command {
 	return runCmd
 }
 
-func NewStartCmd() *cobra.Command {
+func NewStartCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 	var name string
 	startCmd := &cobra.Command{
 		Args:  cobra.MinimumNArgs(1),
 		Use:   "start",
 		Short: "Start a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendStartMessage(name)
+			c.Start(ctx, &proto.StartRequest{
+				Name: name,
+			})
 		},
 	}
 	startCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
 	return startCmd
 }
 
-func NewStopCmd() *cobra.Command {
+func NewStopCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 	var name string
 	stopCmd := &cobra.Command{
 		Args:  cobra.MinimumNArgs(1),
 		Use:   "stop",
 		Short: "Stop a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendStopMessage(name)
+			c.Stop(ctx, &proto.StopRequest{
+				Name: name,
+			})
 		},
 	}
 	stopCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
 	return stopCmd
 }
 
-func NewRestartCmd() *cobra.Command {
+func NewRestartCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 	var name string
 	restartCmd := &cobra.Command{
 		Args:  cobra.MinimumNArgs(1),
 		Use:   "restart",
 		Short: "Restart a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendRestartMessage(name)
+			c.Restart(ctx, &proto.RestartRequest{
+				Name: name,
+			})
 		},
 	}
 	restartCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
 	return restartCmd
 }
 
-func NewStatusCmd() *cobra.Command {
+func NewStatusCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 	var name string
 	statusCmd := &cobra.Command{
 		Args:  cobra.MinimumNArgs(1),
 		Use:   "status",
 		Short: "Status a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendStatusMessage(name)
+			c.Status(ctx, &proto.StatusRequest{
+				Name: name,
+			})
 		},
 	}
 	statusCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
 	return statusCmd
 }
 
-func NewDeleteCmd() *cobra.Command {
+func NewDeleteCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 	var name string
 	deleteCmd := &cobra.Command{
 		Args:  cobra.MinimumNArgs(1),
 		Use:   "delete",
 		Short: "Delete a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendDeleteMessage(name)
+			c.Delete(ctx, &proto.DeleteRequest{
+				Name: name,
+			})
 		},
 	}
 	deleteCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
 	return deleteCmd
 }
 
-func NewVersionCmd() *cobra.Command {
+func NewPullCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
+	var name string
+	var tag string
+	pullCmd := &cobra.Command{
+		Args:  cobra.MinimumNArgs(0),
+		Use:   "pull",
+		Short: "Pull a container",
+		Run: func(cmd *cobra.Command, args []string) {
+			if tag == "" {
+				tag = "latest"
+			}
+			c.Pull(ctx, &proto.PullRequest{
+				Name: name,
+				Tag:  tag,
+			})
+		},
+	}
+	pullCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
+	pullCmd.PersistentFlags().StringVarP(&tag, "tag", "t", "", "Tag")
+	return pullCmd
+}
+func NewVersionCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 	var version = "0.0.1"
 	versionCmd := &cobra.Command{
 		Use:   "version",
