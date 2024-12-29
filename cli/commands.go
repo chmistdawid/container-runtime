@@ -57,7 +57,9 @@ func NewStartCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 		Use:   "start",
 		Short: "Start a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendStartMessage(name)
+			c.Start(ctx, &proto.StartRequest{
+				Name: name,
+			})
 		},
 	}
 	startCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
@@ -71,7 +73,9 @@ func NewStopCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 		Use:   "stop",
 		Short: "Stop a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendStopMessage(name)
+			c.Stop(ctx, &proto.StopRequest{
+				Name: name,
+			})
 		},
 	}
 	stopCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
@@ -85,7 +89,9 @@ func NewRestartCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 		Use:   "restart",
 		Short: "Restart a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendRestartMessage(name)
+			c.Restart(ctx, &proto.RestartRequest{
+				Name: name,
+			})
 		},
 	}
 	restartCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
@@ -99,7 +105,9 @@ func NewStatusCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 		Use:   "status",
 		Short: "Status a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendStatusMessage(name)
+			c.Status(ctx, &proto.StatusRequest{
+				Name: name,
+			})
 		},
 	}
 	statusCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
@@ -113,13 +121,36 @@ func NewDeleteCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 		Use:   "delete",
 		Short: "Delete a container",
 		Run: func(cmd *cobra.Command, args []string) {
-			sendDeleteMessage(name)
+			c.Delete(ctx, &proto.DeleteRequest{
+				Name: name,
+			})
 		},
 	}
 	deleteCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
 	return deleteCmd
 }
 
+func NewPullCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
+	var name string
+	var tag string
+	pullCmd := &cobra.Command{
+		Args:  cobra.MinimumNArgs(0),
+		Use:   "pull",
+		Short: "Pull a container",
+		Run: func(cmd *cobra.Command, args []string) {
+			if tag == "" {
+				tag = "latest"
+			}
+			c.Pull(ctx, &proto.PullRequest{
+				Name: name,
+				Tag:  tag,
+			})
+		},
+	}
+	pullCmd.PersistentFlags().StringVarP(&name, "name", "n", "", "Name")
+	pullCmd.PersistentFlags().StringVarP(&tag, "tag", "t", "", "Tag")
+	return pullCmd
+}
 func NewVersionCmd(c proto.FeatherClient, ctx context.Context) *cobra.Command {
 	var version = "0.0.1"
 	versionCmd := &cobra.Command{

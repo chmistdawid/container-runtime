@@ -11,6 +11,7 @@ service Feather {
     rpc Restart(RestartRequest) returns (RestartResponse);
     rpc Status(StatusRequest) returns (StatusResponse);
     rpc Delete(DeleteRequest) returns (DeleteResponse);
+    rpc Pull(PullRequest) returns (PullResponse);
 }
 
 message RunRequest {
@@ -64,5 +65,14 @@ message DeleteRequest {
 }
 
 message DeleteResponse {
+    string message = 1;
+}
+
+message PullRequest {
+    string name = 1;
+    string tag = 2;
+}
+
+message PullResponse {
     string message = 1;
 }

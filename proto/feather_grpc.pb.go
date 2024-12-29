@@ -25,6 +25,7 @@ const (
 	Feather_Restart_FullMethodName = "/Feather/Restart"
 	Feather_Status_FullMethodName  = "/Feather/Status"
 	Feather_Delete_FullMethodName  = "/Feather/Delete"
+	Feather_Pull_FullMethodName    = "/Feather/Pull"
 )
 
 // FeatherClient is the client API for Feather service.
@@ -37,6 +38,7 @@ type FeatherClient interface {
 	Restart(ctx context.Context, in *RestartRequest, opts ...grpc.CallOption) (*RestartResponse, error)
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	Pull(ctx context.Context, in *PullRequest, opts ...grpc.CallOption) (*PullResponse, error)
 }
 
 type featherClient struct {
@@ -107,6 +109,16 @@ func (c *featherClient) Delete(ctx context.Context, in *DeleteRequest, opts ...g
 	return out, nil
 }
 
+func (c *featherClient) Pull(ctx context.Context, in *PullRequest, opts ...grpc.CallOption) (*PullResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PullResponse)
+	err := c.cc.Invoke(ctx, Feather_Pull_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FeatherServer is the server API for Feather service.
 // All implementations must embed UnimplementedFeatherServer
 // for forward compatibility.
@@ -117,6 +129,7 @@ type FeatherServer interface {
 	Restart(context.Context, *RestartRequest) (*RestartResponse, error)
 	Status(context.Context, *StatusRequest) (*StatusResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	Pull(context.Context, *PullRequest) (*PullResponse, error)
 	mustEmbedUnimplementedFeatherServer()
 }
 
@@ -144,6 +157,9 @@ func (UnimplementedFeatherServer) Status(context.Context, *StatusRequest) (*Stat
 }
 func (UnimplementedFeatherServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedFeatherServer) Pull(context.Context, *PullRequest) (*PullResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Pull not implemented")
 }
 func (UnimplementedFeatherServer) mustEmbedUnimplementedFeatherServer() {}
 func (UnimplementedFeatherServer) testEmbeddedByValue()                 {}
@@ -274,6 +290,24 @@ func _Feather_Delete_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Feather_Pull_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PullRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FeatherServer).Pull(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Feather_Pull_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FeatherServer).Pull(ctx, req.(*PullRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Feather_ServiceDesc is the grpc.ServiceDesc for Feather service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +338,10 @@ var Feather_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _Feather_Delete_Handler,
+		},
+		{
+			MethodName: "Pull",
+			Handler:    _Feather_Pull_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

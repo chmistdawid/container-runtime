@@ -20,8 +20,9 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := proto.NewFeatherClient(conn)
 	ctx := context.Background()
+
+	c := proto.NewFeatherClient(conn)
 
 	var rootCmd = &cobra.Command{Use: "app"}
 
@@ -32,6 +33,7 @@ func main() {
 	versionCmd := cli.NewVersionCmd(c, ctx)
 	statusCmd := cli.NewStatusCmd(c, ctx)
 	deleteCmd := cli.NewDeleteCmd(c, ctx)
+	pullCmd := cli.NewPullCmd(c, ctx)
 
 	rootCmd.AddCommand(versionCmd)
 
@@ -41,6 +43,7 @@ func main() {
 	rootCmd.AddCommand(restartCmd)
 	rootCmd.AddCommand(statusCmd)
 	rootCmd.AddCommand(deleteCmd)
+	rootCmd.AddCommand(pullCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		panic(err)
